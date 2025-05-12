@@ -1,0 +1,76 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyGameApp());
+
+class MyGameApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '2D Game Demo',
+      home: GameScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class GameScreen extends StatefulWidget {
+  @override
+  _GameScreenState createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  double characterX = 0.0;
+
+  void _onHorizontalSwipe(DragEndDetails details) {
+    setState(() {
+      if (details.primaryVelocity! < 0) {
+        // Swipe left
+        characterX -= 50;
+      } else if (details.primaryVelocity! > 0) {
+        // Swipe right
+        characterX += 50;
+      }
+
+      // Clamp to screen bounds
+      characterX = characterX.clamp(-150.0, 150.0);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onHorizontalDragEnd: _onHorizontalSwipe,
+        child: Stack(
+          children: [
+            Center(
+              child: AnimatedPositioned(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                bottom: 100,
+                left: MediaQuery.of(context).size.width / 2 + characterX - 25,
+                child: Character(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Character extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50,
+      height: 50,
+      child: Image.asset('assets/character.png'), // Add your 2D character asset
+    );
+  }
+}
+
+
+
+

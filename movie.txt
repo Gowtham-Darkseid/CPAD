@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
+void main() => runApp(MovieApp());
+
+class MovieApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Movie Ratings',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: MovieListScreen(),
+    );
+  }
+}
+
+class Movie {
+  String title;
+  String imageUrl;
+  double rating;
+
+  Movie({required this.title, required this.imageUrl, this.rating = 0});
+}
+
+class MovieListScreen extends StatefulWidget {
+  @override
+  _MovieListScreenState createState() => _MovieListScreenState();
+}
+
+class _MovieListScreenState extends State<MovieListScreen> {
+  List<Movie> movies = [
+    Movie(
+      title: 'Inception',
+      imageUrl: 'https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg',
+    ),
+    Movie(
+      title: 'The Dark Knight',
+      imageUrl: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
+    ),
+    Movie(
+      title: 'Interstellar',
+      imageUrl: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+    ),
+  ];
+
+  void updateRating(int index, double rating) {
+    setState(() {
+      movies[index].rating = rating;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Movie Ratings'),
+      ),
+      body: ListView.builder(
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(10),
+              leading: Image.network(movie.imageUrl, width: 60),
+              title: Text(movie.title),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Your Rating: ${movie.rating}'),
+                  RatingBar.builder(
+                    initialRating: movie.rating,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 24,
+                    itemPadding: EdgeInsets.symmetric(horizontal: 4),
+                    itemBuilder: (context, _) =>
+                        Icon(Icons.star, color: Colors.amber),
+                    onRatingUpdate: (rating) =>
+                        updateRating(index, rating),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+

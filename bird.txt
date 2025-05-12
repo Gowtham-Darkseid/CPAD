@@ -1,0 +1,103 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() => runApp(BirdGameApp());
+
+class BirdGameApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flying Bird Game',
+      home: BirdGame(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class BirdGame extends StatefulWidget {
+  @override
+  _BirdGameState createState() => _BirdGameState();
+}
+
+class _BirdGameState extends State<BirdGame> {
+  double birdX = 0;
+  double birdY = 100;
+  int score = 0;
+  final Random _random = Random();
+
+  void startFlying() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        birdX = _random.nextDouble() * 300;
+        birdY = _random.nextDouble() * 500;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startFlying();
+  }
+
+  void onTapBird() {
+    setState(() {
+      score++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Background GIF
+          Positioned.fill(
+            child: Image.network(
+              'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNnZ0ZGdjYW15bzNuZnlzNW8zazQyZ3V1OHd1aWZibjVpM2h4dm9oaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4N1FZFE5AGO3qrUGkw/giphy.gif',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          // Bird animation
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 500),
+            left: birdX,
+            top: birdY,
+            child: GestureDetector(
+              onTap: onTapBird,
+              child: Image.asset(
+                'assets/fly.gif',
+                width: 400,
+                height: 400,
+              ),
+            ),
+          ),
+
+          // Score display
+          Positioned(
+            top: 40,
+            left: 20,
+            child: Text(
+              "Score: $score",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Ensure contrast on the background
+                shadows: [
+                  Shadow(
+                    blurRadius: 4.0,
+                    color: Colors.black,
+                    offset: Offset(2.0, 2.0),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

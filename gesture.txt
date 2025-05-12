@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: GestureDemo(),
+    );
+  }
+}
+
+class GestureDemo extends StatefulWidget {
+  @override
+  _GestureDemoState createState() => _GestureDemoState();
+}
+
+class _GestureDemoState extends State<GestureDemo> {
+  Color tapColor = Colors.blue;
+  Color doubleTapColor = Colors.green;
+  Color longPressColor = Colors.orange;
+  Color horizontalDragColor = Colors.purple;
+  Color verticalDragColor = Colors.red;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Gesture Widgets Demo")),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                tapColor = tapColor == Colors.blue ? Colors.yellow : Colors.blue;
+              });
+            },
+            child: Container(
+              height: 80,
+              width: 200,
+              color: tapColor,
+              alignment: Alignment.center,
+              child: Text("Tap Gesture", style: TextStyle(color: Colors.white)),
+            ),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onDoubleTap: () {
+              setState(() {
+                doubleTapColor = doubleTapColor == Colors.green ? Colors.pink : Colors.green;
+              });
+            },
+            child: Container(
+              height: 80,
+              width: 200,
+              color: doubleTapColor,
+              alignment: Alignment.center,
+              child: Text("Double Tap Gesture", style: TextStyle(color: Colors.white)),
+            ),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onLongPress: () {
+              setState(() {
+                longPressColor = longPressColor == Colors.orange ? Colors.cyan : Colors.orange;
+              });
+            },
+            child: Container(
+              height: 80,
+              width: 200,
+              color: longPressColor,
+              alignment: Alignment.center,
+              child: Text("Long Press Gesture", style: TextStyle(color: Colors.white)),
+            ),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              setState(() {
+                horizontalDragColor = horizontalDragColor == Colors.purple ? Colors.teal : Colors.purple;
+              });
+            },
+            child: Container(
+              height: 80,
+              width: 200,
+              color: horizontalDragColor,
+              alignment: Alignment.center,
+              child: Text("Horizontal Drag Gesture", style: TextStyle(color: Colors.white)),
+            ),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onVerticalDragUpdate: (details) {
+              setState(() {
+                verticalDragColor = verticalDragColor == Colors.red ? Colors.indigo : Colors.red;
+              });
+            },
+            child: Container(
+              height: 80,
+              width: 200,
+              color: verticalDragColor,
+              alignment: Alignment.center,
+              child: Text("Vertical Drag Gesture", style: TextStyle(color: Colors.white)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
