@@ -1,0 +1,143 @@
+EX.NO:08  Live Location.
+
+Aim:
+To develop a Flutter application that fetches and displays the user's live location (latitude and longitude) in real time and generates a shareable Google Maps URL.
+
+Procedure:
+Create a Flutter Project:
+Initialize a new Flutter project and set up the basic folder structure.
+
+Add Required Packages:
+Add geolocator (for location tracking) and permission_handler (for managing location permissions) in pubspec.yaml.
+
+Request Location Permission:
+Check and request runtime location permission using permission_handler package.
+
+Fetch Live Location:
+Use the geolocator package to continuously listen to the device's location updates.
+
+Display Location:
+Show the live latitude and longitude values on the app screen using a Text widget.
+
+Generate Location URL:
+Create a Google Maps URL based on the current latitude and longitude to share the user's location.
+
+Handle UI Updates:
+Update the user interface dynamically as the location changes and provide a button to generate the location link.
+
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+void main() {
+  runApp(LiveLocationApp());
+}
+
+class LiveLocationApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Live Location Sharing',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LiveLocationScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class LiveLocationScreen extends StatefulWidget {
+  @override
+  _LiveLocationScreenState createState() => _LiveLocationScreenState();
+}
+
+class _LiveLocationScreenState extends State<LiveLocationScreen> {
+  Position? _currentPosition;
+  Stream<Position>? _positionStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
+
+  Future<void> _checkPermission() async {
+    var status = await Permission.location.request();
+    if (status.isGranted) {
+      _startLocationUpdates();
+    } else {
+      // Permission denied
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location permission is required')),
+      );
+    }
+  }
+
+  void _startLocationUpdates() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
+
+    _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings);
+
+    _positionStream!.listen((Position position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Live Location Sharing'),
+      ),
+      body: Center(
+        child: _currentPosition == null
+            ? Text('Fetching location...')
+            : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Latitude: ${_currentPosition!.latitude}',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              'Longitude: ${_currentPosition!.longitude}',
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // You can implement "share" feature here!
+                final locationUrl =
+                    "https://www.google.com/maps/search/?api=1&query=${_currentPosition!.latitude},${_currentPosition!.longitude}";
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Location URL copied!\n$locationUrl')),
+                );
+              },
+              child: Text('Get Location URL'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+pubspec.yaml
+
+dependencies:
+  flutter:
+    sdk: flutter
+  geolocator: ^10.0.1
+  permission_handler: ^11.0.1
+
