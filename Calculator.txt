@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
+
+void main() => runApp(MaterialApp(home: Calculator()));
+
+
+class Calculator extends StatefulWidget {
+  @override
+  _CalculatorState createState() => _CalculatorState();
+}
+
+class _CalculatorState extends State<Calculator> {
+  String input = '', result = '';
+  void onPress(String val) {
+    setState(() {
+      if (val == 'C') {
+        input = result = '';
+      } else if (val == '=') {
+        try {
+          result = Parser()
+              .parse(input.replaceAll('x', '*').replaceAll('÷', '/'))
+              .evaluate(EvaluationType.REAL, ContextModel())
+              .toString();
+        } catch (_) {
+          result = 'Error';
+        }
+      } else {
+        input += val;
+      }
+    });
+  }
+
+  Widget btn(String text, {Color color = Colors.black}) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: () => onPress(text),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: color,
+          padding: EdgeInsets.all(24),
+        ),
+        child: Text(text, style: TextStyle(fontSize: 22)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(title: Text('Calculator')),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.bottomRight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(input,
+                      style:
+                          TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  Text(result,
+                      style: TextStyle(fontSize: 28, color: Colors.green)),
+                ],
+              ),
+            ),
+          ),
+          Column(children: [
+            Row(children: [
+              btn('7'),
+              btn('8'),
+              btn('9'),
+              btn('÷', color: Colors.green)
+            ]),
+            Row(children: [
+              btn('4'),
+              btn('5'),
+              btn('6'),
+              btn('×', color: Colors.green)
+            ]),
+            Row(children: [
+              btn('1'),
+              btn('2'),
+              btn('3'),
+              btn('-', color: Colors.green)
+            ]),
+            Row(children: [
+              btn('0'),
+              btn('.'),
+              btn('C', color: Colors.red),
+              btn('+', color: Colors.green)
+            ]),
+            Row(children: [btn('=', color: Colors.green)]),
+          ]),
+        ],
+      ),
+    );
+  }
+}
+
+yaml
+  math_expressions: ^2.1.1
+
