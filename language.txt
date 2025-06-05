@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+// Supported languages
+enum Language { english, tamil }
+
+// Language map (can be extended)
+const Map<Language, Map<String, String>> localizedValues = {
+  Language.english: {
+    'title': 'Hello',
+    'message': 'Welcome to Flutter',
+  },
+  Language.tamil: {
+    'title': 'வணக்கம்',
+    'message': 'Flutter-இல் உங்கள் வரவேற்பு',
+  },
+};
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Language _selectedLanguage = Language.english;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = localizedValues[_selectedLanguage]!;
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
+          bodyLarge: TextStyle(fontSize: 20),
+        ),
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(texts['title']!),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: PopupMenuButton<Language>(
+                tooltip: 'Select Language',
+                icon: const Icon(Icons.language),
+                onSelected: (lang) {
+                  setState(() {
+                    _selectedLanguage = lang;
+                  });
+                },
+                itemBuilder: (context) => Language.values.map((lang) {
+                  return PopupMenuItem(
+                    value: lang,
+                    child: Text(lang.name.toUpperCase()),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+        body: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: Card(
+              key: ValueKey(_selectedLanguage),
+              elevation: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      texts['title']!,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      texts['message']!,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
