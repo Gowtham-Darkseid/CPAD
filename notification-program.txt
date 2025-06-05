@@ -1,0 +1,71 @@
+import 'package:flutter/material.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the notification system
+  await AwesomeNotifications().initialize(
+    null, // icon (null uses default app icon)
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic Notifications',
+        channelDescription: 'Notification channel for basic tests',
+        defaultColor: Color(0xFF9D50DD),
+        ledColor: Colors.white,
+        importance: NotificationImportance.High,
+        channelShowBadge: true,
+      )
+    ],
+  );
+
+  // Request permission to show notifications
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  if (!isAllowed) {
+    AwesomeNotifications().requestPermissionToSendNotifications();
+  }
+
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Local Notification Demo',
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      home: NotificationPage(),
+    );
+  }
+}
+
+class NotificationPage extends StatelessWidget {
+  void showNotification() {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'basic_channel',
+        title: 'Hello!',
+        body: 'This is a local notification using flutter!',
+        notificationLayout: NotificationLayout.Default,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Notification Example')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: showNotification,
+          child: Text('Show Notification'),
+        ),
+      ),
+    );
+  }
+}
+
+pubspec.yaml
+awesome_notifications: ^0.10.1

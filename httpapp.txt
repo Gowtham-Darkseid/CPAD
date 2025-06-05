@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+void main() {
+  runApp(const RedditApp());
+}
+
+class RedditApp extends StatelessWidget {
+  const RedditApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Reddit Posts',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const RedditPostsPage(),
+    );
+  }
+}
+
+class RedditPostsPage extends StatefulWidget {
+  const RedditPostsPage({Key? key}) : super(key: key);
+
+  @override
+  State<RedditPostsPage> createState() => _RedditPostsPageState();
+}
+
+class _RedditPostsPageState extends State<RedditPostsPage> {
+  List<dynamic> posts = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRedditPosts();
+  }
+
+  Future<void> fetchRedditPosts() async {
+    final url = Uri.parse('https://www.reddit.com/r/flutterdev/top.json?limit=20');
+    try {
+      final response = await http.get(url, headers: {'User-Agent': 'flutter:reddit.app:v1.0 (by /u/yourusername)'});
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        setState(() {
+          posts = jsonData['data']['children'];
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load posts');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // Optional: Show error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching posts: $e')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reddit FlutterDev Top Posts'),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index]['data'];
+                final title = post['title'] ?? 'No title';
+                final author = post['author'] ?? 'Unknown';
+                return ListTile(
+                  title: Text(title),
+                  subtitle: Text('by u/$author'),
+                  leading: CircleAvatar(child: Text(author.isNotEmpty ? author[0].toUpperCase() : '?')),
+                );
+              },
+            ),
+    );
+  }
+}
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.6
+
